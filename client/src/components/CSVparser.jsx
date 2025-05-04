@@ -198,9 +198,8 @@ const CSVParser = ({ onDataConfirm }) => {
           </div>
 
           <table className="min-w-full divide-y divide-gray-200">
+            {/* Ensure no whitespace directly inside thead or between thead and tr */}
             <thead className="bg-indigo-500 text-white">
-              {" "}
-              {/* Styled table header */}
               <tr>
                 {/* Updated headers to expect FirstName */}
                 {["FirstName", "Email", "Organization", "Achievement", "Role"].map(
@@ -217,6 +216,7 @@ const CSVParser = ({ onDataConfirm }) => {
                 )}
               </tr>
             </thead>
+            {/* Ensure no whitespace between thead and tbody */}
             <tbody className="bg-white divide-y divide-gray-200">
               {parsedData.map((row, index) => (
                 <tr

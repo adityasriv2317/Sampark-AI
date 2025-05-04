@@ -132,7 +132,7 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
         <textarea
           value={content}
           onChange={handleEditorChange}
-          className="w-full h-96 p-2 border-none focus:ring-0 focus:outline-none resize-none text-sm font-mono" // Basic styling, monospace font helps with HTML
+          className="w-full min-h-80 p-2 border-none focus:ring-0 focus:outline-none resize-none text-sm font-mono" // Basic styling, monospace font helps with HTML
           placeholder="Enter your email content here. Use HTML tags for formatting..."
         />
       </div>
