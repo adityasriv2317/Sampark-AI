@@ -1,6 +1,6 @@
 const express = require("express");
 const { sendMail } = require("./mailController");
-const { sendBulkMail } = require("./bulkController");
+const { scheduleBulkEmails } = require("./scheduler");
 const app = express();
 require("dotenv").config();
 let port = 3000;
@@ -13,7 +13,27 @@ app.get("/", (req, res) => {
 
 app.post("/sendmail", sendMail);
 
-app.post("/send-mails", sendBulkMail);
+// app.post("/send-mails", sendBulkMail);
+
+app.post("/set-emails", async (req, res) => {
+  const { scheduleTime, emails } = req.body;
+
+  if (!scheduledTime || !emails || !Array.isArray(emails)) {
+    return res.status(400).json({ error: "Invalid request body" });
+  }
+
+  try {
+    await scheduleBulkEmails(scheduleTime, emails);
+    res
+      .status(200)
+      .json({ success: true, message: "Emails scheduled successfully" });
+  } catch (error) {
+    console.error("Error scheduling emails:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to schedule emails" });
+  }
+});
 
 const start = async () => {
   try {
