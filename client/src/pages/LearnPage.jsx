@@ -1,6 +1,6 @@
 import React from 'react';
 
-const LearnMorePage = () => {
+const LearnPage = () => {
   return (
     <div className="bg-indigo-50 min-h-screen p-10">
       <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
