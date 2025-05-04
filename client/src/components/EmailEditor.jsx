@@ -58,7 +58,6 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
         // Format for the textarea (plain text)
         // Assuming body is suitable for textarea, or strip HTML if needed
         editorTextToShow = `Subject: ${subject}\n\n${body}`;
-
       } else if (selectedRecipient) {
         // No personalized content, use the template and replace placeholders for preview
         try {
@@ -75,7 +74,8 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
           editorTextToShow = currentBaseContent;
         } catch (error) {
           console.error("Error during placeholder replacement:", error);
-          processedPreviewContent = "<p>Error generating preview from template.</p>";
+          processedPreviewContent =
+            "<p>Error generating preview from template.</p>";
           editorTextToShow = currentBaseContent; // Show base template on error
         }
       } else {
@@ -92,7 +92,6 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
     setPreviewContent(processedPreviewContent);
     // Set the text to be displayed in the textarea
     setCurrentEditorText(editorTextToShow);
-
   }, [content, selectedRecipientIndex, recipients, personalizedEmails]); // Recalculate when any of these change
 
   // Handle change directly from the textarea event
@@ -202,16 +201,15 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
         // eslint-disable-next-line no-eval
         const evaluated = eval(`(${cleaned})`);
         if (Array.isArray(evaluated)) {
-            console.warn("Used eval to parse potentially malformed JSON.");
-            return evaluated;
+          console.warn("Used eval to parse potentially malformed JSON.");
+          return evaluated;
         }
       } catch (evalError) {
-         console.error("Failed to parse JSON even with eval:", evalError);
+        console.error("Failed to parse JSON even with eval:", evalError);
       }
       return null; // Return null if all parsing attempts fail
     }
   }
-
 
   const handleEmailGenerate = async () => {
     if (recipients.length === 0) {
@@ -272,38 +270,47 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
 
           // Check if any emails were successfully generated
           if (Object.keys(newPersonalizedEmails).length > 0) {
-             setPersonalizedEmails(newPersonalizedEmails);
-             alert(
-               `Generated personalized content for ${
-                 Object.keys(newPersonalizedEmails).length
-               } recipients. Check the preview.`
-             );
+            setPersonalizedEmails(newPersonalizedEmails);
+            alert(
+              `Generated personalized content for ${
+                Object.keys(newPersonalizedEmails).length
+              } recipients. Check the preview.`
+            );
           } else {
-             console.error("No valid personalized emails could be extracted from the response.");
-             alert("Error: Could not extract valid email content from the AI response. Please check the console and the raw AI response.");
+            console.error(
+              "No valid personalized emails could be extracted from the response."
+            );
+            alert(
+              "Error: Could not extract valid email content from the AI response. Please check the console and the raw AI response."
+            );
           }
-
         } else {
           console.error(
-            "Failed to parse AI response into the expected array format. Response object:", responseObject // Log the result of parsing
+            "Failed to parse AI response into the expected array format. Response object:",
+            responseObject // Log the result of parsing
           );
           alert(
             "Error: Could not process the generated content. The response was not a valid array. Please check the console."
           );
         }
       } else {
-        console.error("AI API request failed with status:", response.status, "Data:", response.data);
+        console.error(
+          "AI API request failed with status:",
+          response.status,
+          "Data:",
+          response.data
+        );
         alert(`Error: AI request failed with status ${response.status}.`);
       }
     } catch (error) {
-       console.error(
-         "Error during email generation process:",
-         error.response ? error.response.data : error.message,
-         error.stack // Log stack trace for more details
-       );
-       alert(
-         "An error occurred while generating emails. Please check the console for details."
-       );
+      console.error(
+        "Error during email generation process:",
+        error.response ? error.response.data : error.message,
+        error.stack // Log stack trace for more details
+      );
+      alert(
+        "An error occurred while generating emails. Please check the console for details."
+      );
     } finally {
       setAILoading(false);
     }
@@ -339,8 +346,8 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
         </p>
         <p className="mt-1 mb-2 text-xs text-gray-500">
           Click the <Brain size={12} className="inline -mt-1" /> button to
-          generate personalized content for all recipients based on the template
-          structure and their data. View results in the preview section.
+          generate personalized content for all recipients based on the template <br/>
+          structure and their data.
         </p>
       </div>
 
