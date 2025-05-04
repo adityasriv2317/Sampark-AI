@@ -189,12 +189,12 @@ const EmailEditor = ({ initialContent, onSave, recipients = [], onPersonalizedEm
         const responseText =
           response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-        console.log("Raw AI Response Text:", responseText); // Log the raw response text
+      //  console.log("Raw AI Response Text:", responseText); // Log the raw response text
 
         // Use the extract function to clean and parse the JSON
         const responseObject = extract(responseText);
 
-        console.log("Parsed Response Object:", responseObject); // Log the parsed object
+      //  console.log("Parsed Response Object:", responseObject); // Log the parsed object
 
         if (responseObject && Array.isArray(responseObject)) {
           const newPersonalizedEmails = {};
