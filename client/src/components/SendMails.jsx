@@ -1,17 +1,40 @@
 import React, { useState } from "react";
 import { Send, CircleX } from "lucide-react";
+import axios from "axios";
 
 const SendMails = ({ emails = [], onSend, onClose }) => {
   const [scheduledTime, setScheduledTime] = useState("");
-  const isSending = false;
+  const [isSending, setIsSending] = useState(false);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!scheduledTime) {
       alert("Please select a scheduled time.");
       return;
     }
     if (onSend) onSend({ scheduledTime, emails });
-    alert(`Emails scheduled for ${scheduledTime} (mock send)`);
+    // alert(`Emails scheduled for ${scheduledTime} (mock send)`);
+
+    // send using axios
+    if (!isSending) {
+      try {
+        setIsSending(true);
+        const sendApi = import.meta.env.VITE_SEND_BULK;
+
+        const response = await axios.post(sendApi, {
+          scheduledTime,
+          emails,
+        });
+
+        if (response.status === 200) {
+          alert("Emails sent successfully");
+        }
+      } catch (error) {
+        alert("Error sending emails");
+        console.error(error);
+      } finally {
+        setIsSending(false);
+      }
+    }
   };
 
   return (
@@ -40,12 +63,22 @@ const SendMails = ({ emails = [], onSend, onClose }) => {
             />
           </label>
           <button
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded transition-colors duration-200"
+            className={`${
+              isSending ? "cursor-not-allowed" : "cursor-pointer"
+            } bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded transition-colors duration-200`}
             onClick={handleSend}
             disabled={emails.length === 0}
           >
-            <Send className="inline-block mr-2" />
-            Send
+            {isSending ? (
+              <div className="flex items-center">
+                <div className="w-4 h-4 mr-2 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
+              </div>
+            ) : (
+              <>
+                <Send className="inline-block mr-2" />
+                Send
+              </>
+            )}
           </button>
         </div>
         <div className="overflow-x-auto border border-indigo-600 shadow-md rounded-lg bg-white">
