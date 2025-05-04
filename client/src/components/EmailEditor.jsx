@@ -1,21 +1,14 @@
 import React, { useState, useEffect } from "react";
-// Remove ReactQuill imports
-// import ReactQuill from 'react-quill';
-// import 'react-quill/dist/quill.snow.css';
 import { Save, User, Eye, Brain } from "lucide-react";
 import axios from "axios";
 
-// Remove the getFirstName helper function
-// const getFirstName = (fullName) => { ... };
-
 // Accept recipients prop
-const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
-  const [content, setContent] = useState(initialContent || ""); // Base template
+const EmailEditor = ({ initialContent, onSave, recipients = [], onPersonalizedEmails }) => {
+  const [content, setContent] = useState(initialContent || "");
   const [selectedRecipientIndex, setSelectedRecipientIndex] = useState(0);
-  const [previewContent, setPreviewContent] = useState(""); // HTML for preview div
+  const [previewContent, setPreviewContent] = useState("");
   const [aiLoading, setAILoading] = useState(false);
   const [personalizedEmails, setPersonalizedEmails] = useState({});
-  // State to hold the text currently displayed in the textarea
   const [currentEditorText, setCurrentEditorText] = useState(content);
 
   // Update selected index if recipients list changes
@@ -29,19 +22,16 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
     }
   }, [recipients, selectedRecipientIndex]);
 
-  // Clear personalized emails if the base template changes
-  // This effect now correctly handles resetting when the template is modified
   useEffect(() => {
     setPersonalizedEmails({});
     // If the editor was showing personalized text, reset it to the new base template
     setCurrentEditorText(content);
   }, [content]); // Only depends on content
 
-  // Refined useEffect for generating preview content AND setting editor text
   useEffect(() => {
     const currentBaseContent = String(content || "");
-    let processedPreviewContent = currentBaseContent; // For preview (HTML)
-    let editorTextToShow = currentBaseContent; // For textarea (plain text)
+    let processedPreviewContent = currentBaseContent;
+    let editorTextToShow = currentBaseContent;
 
     if (
       recipients.length > 0 &&
@@ -50,16 +40,12 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
     ) {
       const selectedRecipient = recipients[selectedRecipientIndex];
 
-      // Check if personalized content exists for this recipient first
       if (personalizedEmails[selectedRecipientIndex]) {
         const { subject, body } = personalizedEmails[selectedRecipientIndex];
         // Format the preview with subject and body (HTML)
         processedPreviewContent = `<h3>Subject: ${subject}</h3><hr/>${body}`;
-        // Format for the textarea (plain text)
-        // Assuming body is suitable for textarea, or strip HTML if needed
         editorTextToShow = `Subject: ${subject}\n\n${body}`;
       } else if (selectedRecipient) {
-        // No personalized content, use the template and replace placeholders for preview
         try {
           processedPreviewContent = currentBaseContent.replace(
             /\{\{(\w+)\}\}/g,
@@ -90,24 +76,17 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
     }
 
     setPreviewContent(processedPreviewContent);
-    // Set the text to be displayed in the textarea
     setCurrentEditorText(editorTextToShow);
-  }, [content, selectedRecipientIndex, recipients, personalizedEmails]); // Recalculate when any of these change
+  }, [content, selectedRecipientIndex, recipients, personalizedEmails]);
 
-  // Handle change directly from the textarea event
   const handleEditorChange = (event) => {
     const newValue = event.target.value;
-    // Update the base template state FIRST
     setContent(newValue);
-    // Update the textarea display immediately to reflect typing
     setCurrentEditorText(newValue);
-    // The useEffect listening to `content` will clear personalizedEmails automatically
   };
 
   const handleSave = () => {
     if (onSave) {
-      // Decide what to save: just the template, or maybe the personalized data too?
-      // For now, just saving the base template.
       onSave(content);
     }
   };
@@ -116,27 +95,8 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
     setSelectedRecipientIndex(Number(event.target.value));
   };
 
-  function objectify(escapedJsonString) {
-    try {
-      // Remove code fence markers if present
-      let cleanedString = escapedJsonString;
-      if (cleanedString.includes("```json\\n")) {
-        cleanedString = cleanedString.replace(/```json\\n|\n```$/g, "");
-      }
-
-      // Parse the JSON string (this is already escaped properly in the string representation)
-      const jsonObject = JSON.parse(cleanedString);
-
-      return jsonObject;
-    } catch (error) {
-      console.error("Error parsing JSON string:", error);
-      return null;
-    }
-  }
-
   // Your existing generatePrompt function
   const generatePrompt = () => {
-    // Removed unused 'recipient' parameter
     let prompt = `Given the following list of individuals, each with their name, organization, recent achievement, and role:\n\n`;
 
     recipients.forEach((recipient) => {
@@ -146,7 +106,6 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
       prompt += `Role: ${recipient.Role || "N/A"}\n\n`;
     });
 
-    // Updated prompt asking for JSON containing subject and body for each person
     prompt += `For each person listed above, please generate a personalized email for an invitation to VBDA 2025. The email should be engaging and relevant to their achievement and role.\n`;
     prompt += `Respond ONLY with a valid JSON array. Each object in the array should correspond to a person in the order provided and contain the following keys:\n`;
     prompt += `- "Name": The person's name.\n`;
@@ -188,17 +147,10 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
       .trim();
 
     try {
-      // Attempt to parse the cleaned string
       return JSON.parse(cleaned);
     } catch (e) {
-      console.error("Invalid JSON after cleanup:", e, "Input:", raw); // Log input on error
-      // Try a more lenient approach if standard parsing fails
-      // This is a fallback and might indicate issues with the AI response format
+      console.error("Invalid JSON after cleanup");
       try {
-        // Attempt to evaluate the string as a JavaScript literal (Use with caution!)
-        // This is generally unsafe if the source is not trusted.
-        // Consider using a safer JSON repair library if this becomes common.
-        // eslint-disable-next-line no-eval
         const evaluated = eval(`(${cleaned})`);
         if (Array.isArray(evaluated)) {
           console.warn("Used eval to parse potentially malformed JSON.");
@@ -207,7 +159,7 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
       } catch (evalError) {
         console.error("Failed to parse JSON even with eval:", evalError);
       }
-      return null; // Return null if all parsing attempts fail
+      return null;
     }
   }
 
@@ -271,6 +223,16 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
           // Check if any emails were successfully generated
           if (Object.keys(newPersonalizedEmails).length > 0) {
             setPersonalizedEmails(newPersonalizedEmails);
+            // Pass the personalized emails up to parent
+            if (onPersonalizedEmails) {
+              // Convert to array of { recipient, subject, body }
+              const emailsArray = Object.entries(newPersonalizedEmails).map(([idx, val]) => ({
+                recipient: recipients[idx],
+                subject: val.subject,
+                body: val.body,
+              }));
+              onPersonalizedEmails(emailsArray);
+            }
             alert(
               `Generated personalized content for ${
                 Object.keys(newPersonalizedEmails).length
@@ -427,7 +389,7 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
           }
         >
           <Save size={18} className="mr-2" />
-          Save Base Template
+          Save Template
         </button>
       </div>
     </div>

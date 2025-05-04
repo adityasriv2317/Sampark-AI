@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import CSVParser from "../components/CSVparser";
 import EmailEditor from "../components/EmailEditor";
+import SendMails from "../components/SendMails";
 
 const Hero = () => {
   return (
@@ -39,52 +40,83 @@ const Hero = () => {
 };
 
 const MailingLayout = () => {
-  // State to hold the confirmed data from CSVParser
   const [confirmedRecipients, setConfirmedRecipients] = useState([]);
+  const [baseTemplate, setBaseTemplate] = useState(
+    "<p>Hello {{FirstName}},</p><p>We noticed your recent achievement: {{Achievement}} at {{Organization}}.</p><p>Best regards,</p><p>Team Sampark AI</p>"
+  );
+  const [personalizedEmails, setPersonalizedEmails] = useState([]);
+  const [isReady, setIsReady] = useState(false);
 
+  // Helper to fill template with recipient data
+  const fillTemplate = (template, recipient) => {
+    return template.replace(/\{\{(\w+)\}\}/g, (match, key) =>
+      recipient[key] !== undefined && recipient[key] !== null
+        ? String(recipient[key])
+        : ""
+    );
+  };
 
   // Callback function for CSVParser to update the confirmed data
   const handleDataConfirm = (data) => {
-    // Add FirstName if only Name exists (optional fallback)
-    const processedData = data.map(recipient => ({
-        ...recipient,
-        FirstName: recipient.FirstName || (recipient.Name ? recipient.Name.split(' ')[0] : '') // Ensure FirstName exists
+    const processedData = data.map((recipient) => ({
+      ...recipient,
+      FirstName:
+        recipient.FirstName ||
+        (recipient.Name ? recipient.Name.split(" ")[0] : ""),
     }));
     setConfirmedRecipients(processedData);
-    // console.log("Recipients confirmed in MailingLayout:", processedData);
-    // Optionally, scroll to the editor after confirming data
+
+    // Generate default personalized emails using the base template
+    const defaultEmails = processedData.map((recipient) => ({
+      recipient,
+      subject: "Congratulations on Your Achievement",
+      body: fillTemplate(baseTemplate, recipient),
+    }));
+    setPersonalizedEmails(defaultEmails);
+
     const emailEditorSection = document.querySelector(".email-editor");
     if (emailEditorSection) {
-        emailEditorSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      emailEditorSection.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
   // Callback function for EmailEditor to save the email content (example)
   const handleEmailSave = (content) => {
-    // console.log("Email content saved:", content);
-    // Here you would typically send the content and recipient list to your backend
-    // alert("Email content saved! Check the console.");
+    setBaseTemplate(content);
+    // Optionally, update personalizedEmails with the new template for all recipients
+    const updatedEmails = confirmedRecipients.map((recipient) => ({
+      recipient,
+      subject: "Congratulations on Your Achievement",
+      body: fillTemplate(content, recipient),
+    }));
+    setPersonalizedEmails(updatedEmails);
+    setIsReady(true);
   };
 
+  const handleClose = () => {
+    setIsReady(false);
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className="flex-grow container mx-auto px-4 py-8"> {/* Added container styling */}
+      <main className="flex-grow container mx-auto px-4 py-8">
         <Hero />
-
-        {/* Pass the handler down to CSVParser */}
         <CSVParser onDataConfirm={handleDataConfirm} />
+        <EmailEditor
+          recipients={confirmedRecipients}
+          onSave={handleEmailSave}
+          initialContent={baseTemplate}
+          onPersonalizedEmails={setPersonalizedEmails}
+        />
 
-        {/* Pass the confirmed recipients and save handler down to EmailEditor */}
-        {/* Conditionally render EmailEditor only when recipients are confirmed? Optional. */}
-        {/* {confirmedRecipients.length > 0 && ( */}
-          <EmailEditor
-            recipients={confirmedRecipients}
-            onSave={handleEmailSave}
-            initialContent="<p>Hello {{FirstName}},</p><p>We noticed your recent achievement: {{Achievement}} at {{Organization}}.</p><p>Best regards,</p><p>Team Sampark AI</p>" // Use FirstName placeholder
-          />
-        {/* )} */}
+        {/* {personalizedEmails.length > 0 && (
+          <SendMails emails={personalizedEmails} />
+        )} */}
+
+        {isReady && personalizedEmails.length > 0 && (
+          <SendMails emails={personalizedEmails} onClose={handleClose} />
+        )}
       </main>
       <Footer />
     </div>
