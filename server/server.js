@@ -1,5 +1,6 @@
 const express = require("express");
 const { sendMail } = require("./mailController");
+const { sendBulkMail } = require("./bulkController");
 const app = express();
 require("dotenv").config();
 let port = 3000;
@@ -11,6 +12,8 @@ app.get("/", (req, res) => {
 });
 
 app.post("/sendmail", sendMail);
+
+app.post("/send-mails", sendBulkMail);
 
 const start = async () => {
   try {
