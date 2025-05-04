@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { Send, CircleX } from "lucide-react";
 
 const SendMails = ({ emails = [], onSend, onClose }) => {
   const [scheduledTime, setScheduledTime] = useState("");
+  const isSending = false;
 
   const handleSend = () => {
     if (!scheduledTime) {
@@ -21,12 +23,13 @@ const SendMails = ({ emails = [], onSend, onClose }) => {
           onClick={onClose}
           aria-label="Close"
         >
-          &times;
+          {/* &times; */}
+          <CircleX className="inline-block" />
         </button>
         <h2 className="text-2xl border-b-2 text-indigo-500 border-b-indigo-600 w-fit mx-auto font-semibold text-center mb-6">
           Review Emails
         </h2>
-        <div className="mb-6 flex flex-col md:flex-row items-center gap-4">
+        <div className="mb-6 mx-2 flex flex-col md:flex-row items-center justify-between">
           <label className="font-medium text-gray-700">
             Schedule Send Time:
             <input
@@ -41,7 +44,8 @@ const SendMails = ({ emails = [], onSend, onClose }) => {
             onClick={handleSend}
             disabled={emails.length === 0}
           >
-            Send Emails (Mock)
+            <Send className="inline-block mr-2" />
+            Send
           </button>
         </div>
         <div className="overflow-x-auto border border-indigo-600 shadow-md rounded-lg bg-white">
