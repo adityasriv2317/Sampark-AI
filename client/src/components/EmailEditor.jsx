@@ -10,12 +10,13 @@ import axios from "axios";
 
 // Accept recipients prop
 const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
-  const [content, setContent] = useState(initialContent || "");
+  const [content, setContent] = useState(initialContent || ""); // Base template
   const [selectedRecipientIndex, setSelectedRecipientIndex] = useState(0);
-  const [previewContent, setPreviewContent] = useState("");
+  const [previewContent, setPreviewContent] = useState(""); // HTML for preview div
   const [aiLoading, setAILoading] = useState(false);
-  // State to store personalized emails { index: { subject: '...', body: '...' } }
   const [personalizedEmails, setPersonalizedEmails] = useState({});
+  // State to hold the text currently displayed in the textarea
+  const [currentEditorText, setCurrentEditorText] = useState(content);
 
   // Update selected index if recipients list changes
   useEffect(() => {
@@ -29,14 +30,18 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
   }, [recipients, selectedRecipientIndex]);
 
   // Clear personalized emails if the base template changes
+  // This effect now correctly handles resetting when the template is modified
   useEffect(() => {
     setPersonalizedEmails({});
-  }, [content]);
+    // If the editor was showing personalized text, reset it to the new base template
+    setCurrentEditorText(content);
+  }, [content]); // Only depends on content
 
-  // Refined useEffect for generating preview content
+  // Refined useEffect for generating preview content AND setting editor text
   useEffect(() => {
-    const currentContent = String(content || "");
-    let processedContent = currentContent;
+    const currentBaseContent = String(content || "");
+    let processedPreviewContent = currentBaseContent; // For preview (HTML)
+    let editorTextToShow = currentBaseContent; // For textarea (plain text)
 
     if (
       recipients.length > 0 &&
@@ -48,14 +53,16 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
       // Check if personalized content exists for this recipient first
       if (personalizedEmails[selectedRecipientIndex]) {
         const { subject, body } = personalizedEmails[selectedRecipientIndex];
-        // Format the preview with subject and body
-        // Using simple H3 for subject, adjust as needed
-        processedContent = `<h3>Subject: ${subject}</h3><hr/>${body}`;
-      }
-      // If no personalized content, use the template and replace placeholders
-      else if (selectedRecipient) {
+        // Format the preview with subject and body (HTML)
+        processedPreviewContent = `<h3>Subject: ${subject}</h3><hr/>${body}`;
+        // Format for the textarea (plain text)
+        // Assuming body is suitable for textarea, or strip HTML if needed
+        editorTextToShow = `Subject: ${subject}\n\n${body}`;
+
+      } else if (selectedRecipient) {
+        // No personalized content, use the template and replace placeholders for preview
         try {
-          processedContent = currentContent.replace(
+          processedPreviewContent = currentBaseContent.replace(
             /\{\{(\w+)\}\}/g,
             (match, key) => {
               return selectedRecipient[key] !== undefined &&
@@ -64,25 +71,38 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
                 : "";
             }
           );
+          // Editor shows the base template
+          editorTextToShow = currentBaseContent;
         } catch (error) {
           console.error("Error during placeholder replacement:", error);
-          processedContent = "<p>Error generating preview from template.</p>";
+          processedPreviewContent = "<p>Error generating preview from template.</p>";
+          editorTextToShow = currentBaseContent; // Show base template on error
         }
       } else {
         // Fallback if recipient data is invalid
-        processedContent = currentContent;
+        processedPreviewContent = currentBaseContent;
+        editorTextToShow = currentBaseContent;
       }
     } else {
       // No recipients or invalid index, show base template
-      processedContent = currentContent;
+      processedPreviewContent = currentBaseContent;
+      editorTextToShow = currentBaseContent;
     }
-    setPreviewContent(processedContent);
-  }, [content, selectedRecipientIndex, recipients, personalizedEmails]); // Add personalizedEmails dependency
+
+    setPreviewContent(processedPreviewContent);
+    // Set the text to be displayed in the textarea
+    setCurrentEditorText(editorTextToShow);
+
+  }, [content, selectedRecipientIndex, recipients, personalizedEmails]); // Recalculate when any of these change
 
   // Handle change directly from the textarea event
   const handleEditorChange = (event) => {
-    setContent(event.target.value);
-    // Clearing personalized emails on template change is handled by a separate useEffect
+    const newValue = event.target.value;
+    // Update the base template state FIRST
+    setContent(newValue);
+    // Update the textarea display immediately to reflect typing
+    setCurrentEditorText(newValue);
+    // The useEffect listening to `content` will clear personalizedEmails automatically
   };
 
   const handleSave = () => {
@@ -326,8 +346,8 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
 
       <div className="email-editor-container border border-gray-300 rounded-lg overflow-hidden shadow-sm mb-6 bg-white p-1">
         <textarea
-          value={content} // Textarea always shows the base template
-          onChange={handleEditorChange}
+          value={currentEditorText} // Bind value to the new state
+          onChange={handleEditorChange} // Use the updated handler
           className="w-full min-h-80 p-2 border-none focus:ring-0 focus:outline-none resize-none text-sm font-mono"
           placeholder="Enter your base email template here. Use HTML tags for formatting..."
         />
@@ -380,7 +400,7 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
           {/* Preview Content Area */}
           <div
             className="preview-content p-4 border border-gray-300 rounded-lg bg-gray-50 min-h-[200px] shadow-inner prose max-w-none"
-            dangerouslySetInnerHTML={{ __html: String(previewContent || "") }}
+            dangerouslySetInnerHTML={{ __html: String(previewContent || "") }} // Preview uses HTML content
           />
         </div>
       )}
