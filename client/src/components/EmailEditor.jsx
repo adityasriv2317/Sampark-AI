@@ -116,14 +116,14 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
 
       {/* Updated hint text */}
       <div className="w-full text-center">
-      <p className="text-xs text-gray-500">
-        Use placeholders like FirstName, Email, Organization, Achievement, Role in
-        your email.
-      </p>
-      <p className="mt-1 mb-2 text-xs text-gray-500">
-        You can use HTML tags (e.g., `&lt;b&gt;bold&lt;/b&gt;`,
-        `&lt;p&gt;paragraph&lt;/p&gt;`) for formatting.
-      </p>
+        <p className="text-xs text-gray-500">
+          Use placeholders like FirstName, Email, Organization, Achievement,
+          Role in your email.
+        </p>
+        <p className="mt-1 mb-2 text-xs text-gray-500">
+          You can use HTML tags (e.g., `&lt;b&gt;bold&lt;/b&gt;`,
+          `&lt;p&gt;paragraph&lt;/p&gt;`) for formatting.
+        </p>
       </div>
 
       <div className="email-editor-container border border-gray-300 rounded-lg overflow-hidden shadow-sm mb-6 bg-white p-1">
@@ -138,29 +138,6 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
       </div>
 
       {/* Recipient Selector - Only show if recipients exist */}
-      {recipients.length > 0 && (
-        <div className="mb-6">
-          <label
-            htmlFor="recipient-select"
-            className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2"
-          >
-            <User size={16} /> Preview for Recipient:
-          </label>
-          <select
-            id="recipient-select"
-            value={selectedRecipientIndex}
-            onChange={handleRecipientChange}
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm"
-          >
-            {recipients.map((recipient, index) => (
-              // Use FirstName directly
-              <option key={index} value={index}>
-                {`${recipient.FirstName || "N/A"} (${recipient.Email || "N/A"})`}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
       {recipients.length === 0 && (
         <p className="mb-6 text-center text-gray-500 italic">
           Upload and confirm a recipient list above to enable preview.
@@ -170,11 +147,39 @@ const EmailEditor = ({ initialContent, onSave, recipients = [] }) => {
       {/* Preview Section - Only show if recipients exist */}
       {recipients.length > 0 && (
         <div className="email-preview mt-8">
-          {/* Update preview title to use FirstName */}
-          <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
-            <Eye size={20} /> Live Preview (for{" "}
-            {recipients[selectedRecipientIndex]?.FirstName || "Selected User"})
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
+              <Eye size={20} /> Live Preview (for{" "}
+              {recipients[selectedRecipientIndex]?.FirstName || "Selected User"}
+              )
+            </h3>
+
+            {recipients.length > 0 && (
+              <div className="mb-6 flex gap-2">
+                <label
+                  htmlFor="recipient-select"
+                  className="text-sm w-fit font-medium text-gray-700 flex items-center gap-2"
+                >
+                  <User size={16} /> Recipient:
+                </label>
+                <select
+                  id="recipient-select"
+                  value={selectedRecipientIndex}
+                  onChange={handleRecipientChange}
+                  className="block w-full pl-3 pr-10 py-2 text-base border-1 transition-all ease-in-out focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm rounded-md shadow-sm"
+                >
+                  {recipients.map((recipient, index) => (
+                    // Use FirstName directly
+                    <option key={index} value={index}>
+                      {`${recipient.FirstName || "N/A"} (${
+                        recipient.Email || "N/A"
+                      })`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
           <div
             className="preview-content p-4 border border-gray-300 rounded-lg bg-gray-50 min-h-[200px] shadow-inner prose max-w-none"
             // Ensure previewContent is always a string
