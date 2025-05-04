@@ -1,20 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
 // Import necessary icons from lucide-react
-import {
-  Mail,
-  Menu,
-  X,
-  Home,
-  MailPlus,
-  Mails,
-  LogIn,
-  UserPlus,
-} from "lucide-react";
-
-import icon from "/sampark.png";
 import {
   Mail,
   Menu,
@@ -45,17 +31,9 @@ const Navbar = () => {
   return (
     // Updated background to indigo, adjusted padding slightly
     <nav className="bg-indigo-600 text-white px-6 py-4 shadow-md fixed top-0 left-0 w-full z-50 md:relative md:flex md:items-center md:justify-between">
-    <nav className="bg-indigo-600 text-white px-6 py-4 shadow-md fixed top-0 left-0 w-full z-50 md:relative md:flex md:items-center md:justify-between">
       {/* Brand/Logo and Toggle Button Container */}
       <div className="flex items-center justify-between">
         {/* Logo with Icon */}
-        <Link
-          to="/"
-          className="flex items-center gap-2 text-xl font-semibold"
-          onClick={handleLinkClick}
-        >
-          {/* <Mail size={24} /> //Added Mail icon */}
-          <img src={icon} alt="Sampark AI Logo" className="h-12" />
         <Link
           to="/"
           className="flex items-center gap-2 text-xl font-semibold"
@@ -68,18 +46,11 @@ const Navbar = () => {
         {/* Mobile Menu Toggle Button using Lucide icons */}
         <button className="md:hidden text-2xl" onClick={toggleMenu}>
           {isOpen ? <X size={28} /> : <Menu size={28} />}{" "}
-          {isOpen ? <X size={28} /> : <Menu size={28} />}{" "}
-          {/* Use Lucide Menu/X icons */}
         </button>
       </div>
 
       {/* Navigation Links Container */}
       {/* Added flex-grow and justify-center for medium screens+ to center links */}
-      <div
-        className={`flex-grow md:flex md:items-center md:justify-center ${
-          isOpen ? "block" : "hidden"
-        } md:block`}
-      >
       <div
         className={`flex-grow md:flex md:items-center md:justify-center ${
           isOpen ? "block" : "hidden"
@@ -113,31 +84,6 @@ const Navbar = () => {
             </Link>
           </li>
         </ul>
-      </div>
-      </div>
-      {/* Login/Signup Buttons */}
-      {/* Hidden on mobile (handled by menu toggle), flex on medium+ */}
-      <div
-        className={`hidden md:flex items-center gap-4 ${
-          isOpen ? " flex flex-col items-center w-full mt-4" : ""
-        }`}
-      >
-        <Link
-          to="/login"
-          className="flex items-center gap-1 bg-white text-indigo-600 px-4 py-2 rounded font-medium hover:bg-indigo-100 transition-colors duration-200 w-full md:w-auto justify-center"
-          onClick={handleLinkClick}
-        >
-          <LogIn size={16} />
-          Login
-        </Link>
-        <Link
-          to="/signup"
-          className="flex items-center gap-1 bg-indigo-700 text-white px-4 py-2 rounded font-medium hover:bg-indigo-800 transition-colors duration-200 w-full md:w-auto justify-center"
-          onClick={handleLinkClick}
-        >
-          <UserPlus size={16} />
-          Sign Up
-        </Link>
       </div>
     </nav>
   );
