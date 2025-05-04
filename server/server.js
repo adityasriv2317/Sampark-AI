@@ -1,9 +1,12 @@
 const express = require("express");
+const cors = require("cors");
 const { sendMail } = require("./mailController");
 const { scheduleBulkEmails } = require("./scheduler");
 const app = express();
 require("dotenv").config();
 let port = 3000;
+
+app.use(cors());
 
 app.use(express.json());
 
