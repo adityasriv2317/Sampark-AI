@@ -1,6 +1,6 @@
 const Home = () => {
   return (
-    <div className="relative min-h-screen">
+    <div className="relative h-screen">
       {/* Hero Section */}
       <div className="relative isolate px-6 pt-14 lg:px-8">
         <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">

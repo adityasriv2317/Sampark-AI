@@ -2,7 +2,7 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className="bg-indigo-600 text-white p-4 mt-auto"> {/* Use mt-auto if footer is inside a flex container like App.jsx */}
+    <footer className="relative bottom-0 w-full bg-indigo-600 text-white p-4 mt-auto"> {/* Use mt-auto if footer is inside a flex container like App.jsx */}
       <div className="container mx-auto text-center text-sm">
         <div className="mb-2"> {/* Added margin-bottom to separate from links */}
           &copy; {new Date().getFullYear()} Sampark AI. All rights reserved.
