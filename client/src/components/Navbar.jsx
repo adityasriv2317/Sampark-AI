@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaBars, FaTimes } from 'react-icons/fa';
-// import './Navbar.css'; // Remove this line - CSS file is no longer needed
+// Import necessary icons from lucide-react
+import { Mail, Menu, X, Home, MailPlus, Mails, LogIn, UserPlus } from 'lucide-react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,66 +18,86 @@ const Navbar = () => {
   };
 
   return (
-    // Navbar container: Fixed top on mobile, relative on medium screens+, background, padding, text color, shadow
-    <nav className="bg-gray-800 text-white p-4 shadow-md fixed top-0 left-0 w-full z-50 md:relative md:flex md:items-center md:justify-between">
+    // Updated background to indigo, adjusted padding slightly
+    <nav className="bg-indigo-600 text-white p-4 shadow-md fixed top-0 left-0 w-full z-50 md:relative md:flex md:items-center md:justify-between">
       {/* Brand/Logo and Toggle Button Container */}
       <div className="flex items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="text-xl font-bold" onClick={handleLinkClick}>
+        {/* Logo with Icon */}
+        <Link to="/" className="flex items-center gap-2 text-xl font-semibold" onClick={handleLinkClick}>
+          <Mail size={24} /> {/* Added Mail icon */}
           Sampark AI
         </Link>
-        {/* Mobile Menu Toggle Button (hidden on medium screens and up) */}
+        {/* Mobile Menu Toggle Button using Lucide icons */}
         <button className="md:hidden text-2xl" onClick={toggleMenu}>
-          {isOpen ? <FaTimes /> : <FaBars />}
+          {isOpen ? <X size={28} /> : <Menu size={28} />} {/* Use Lucide Menu/X icons */}
         </button>
       </div>
 
-      {/* Navigation Links */}
-      {/* Menu: Hidden on mobile unless 'isOpen', flex row on medium screens+ */}
-      {/* Added transition for smoother opening/closing on mobile */}
-      <ul
-        className={`
-          list-none p-0 m-0 mt-4 md:mt-0 md:flex md:space-x-6
-          ${isOpen ? 'block' : 'hidden'} md:block
-          transition-all duration-300 ease-in-out
-        `}
-      >
-        {/* Nav Items */}
-        <li className="my-2 md:my-0">
-          <Link
-            to="/"
-            className="block py-2 px-3 md:p-0 rounded hover:bg-gray-700 md:hover:bg-transparent md:hover:text-gray-300"
-            onClick={handleLinkClick}
-          >
-            Home
-          </Link>
-        </li>
-        <li className="my-2 md:my-0">
-          <Link
-            to="/new-mailing"
-            className="block py-2 px-3 md:p-0 rounded hover:bg-gray-700 md:hover:bg-transparent md:hover:text-gray-300"
-            onClick={handleLinkClick}
-          >
-            New Mailing
-          </Link>
-        </li>
-        <li className="my-2 md:my-0">
-          <Link
-            to="/my-mails"
-            className="block py-2 px-3 md:p-0 rounded hover:bg-gray-700 md:hover:bg-transparent md:hover:text-gray-300"
-            onClick={handleLinkClick}
-          >
-            My Mails
-          </Link>
-        </li>
-      </ul>
+      {/* Navigation Links Container */}
+      {/* Added flex-grow and justify-center for medium screens+ to center links */}
+      <div className={`flex-grow md:flex md:items-center md:justify-center ${isOpen ? 'block' : 'hidden'} md:block`}>
+        <ul
+          className={`
+            list-none p-0 m-0 mt-4 md:mt-0 md:flex md:space-x-8  /* Increased space between links */
+            transition-all duration-300 ease-in-out w-full md:w-auto /* Ensure full width on mobile for centering text */
+            text-center md:text-left /* Center text on mobile */
+          `}
+        >
+          {/* Nav Items - Adjusted hover effect and added icons */}
+          <li className="my-2 md:my-0">
+            <Link
+              to="/"
+              className="flex items-center justify-center md:justify-start gap-2 py-2 px-3 md:p-0 rounded hover:bg-indigo-700 md:hover:bg-transparent md:hover:text-indigo-200 transition-colors duration-200"
+              onClick={handleLinkClick}
+            >
+              <Home size={18} /> {/* Home Icon */}
+              Home
+            </Link>
+          </li>
+          <li className="my-2 md:my-0">
+            <Link
+              to="/new-mailing"
+              className="flex items-center justify-center md:justify-start gap-2 py-2 px-3 md:p-0 rounded hover:bg-indigo-700 md:hover:bg-transparent md:hover:text-indigo-200 transition-colors duration-200"
+              onClick={handleLinkClick}
+            >
+              <MailPlus size={18} /> {/* New Mailing Icon */}
+              New Mailing
+            </Link>
+          </li>
+          <li className="my-2 md:my-0">
+            <Link
+              to="/my-mails"
+              className="flex items-center justify-center md:justify-start gap-2 py-2 px-3 md:p-0 rounded hover:bg-indigo-700 md:hover:bg-transparent md:hover:text-indigo-200 transition-colors duration-200"
+              onClick={handleLinkClick}
+            >
+              <Mails size={18} /> {/* My Mails Icon */}
+              My Mails
+            </Link>
+          </li>
+        </ul>
+      </div>
+       {/* Login/Signup Buttons */}
+       {/* Hidden on mobile (handled by menu toggle), flex on medium+ */}
+       <div className={`hidden md:flex items-center gap-4 ${isOpen ? ' flex flex-col items-center w-full mt-4' : ''}`}>
+         <Link
+           to="/login"
+           className="flex items-center gap-1 bg-white text-indigo-600 px-4 py-2 rounded font-medium hover:bg-indigo-100 transition-colors duration-200 w-full md:w-auto justify-center"
+           onClick={handleLinkClick}
+         >
+            <LogIn size={16} />
+            Login
+         </Link>
+         <Link
+           to="/signup"
+           className="flex items-center gap-1 bg-indigo-700 text-white px-4 py-2 rounded font-medium hover:bg-indigo-800 transition-colors duration-200 w-full md:w-auto justify-center"
+           onClick={handleLinkClick}
+         >
+           <UserPlus size={16} />
+           Sign Up
+         </Link>
+       </div>
     </nav>
   );
 };
 
 export default Navbar;
-
-/*
-Removed the CSS styles previously here as they are now handled by Tailwind classes.
-You can now safely delete the Navbar.css file if it's no longer used by other components.
-*/
