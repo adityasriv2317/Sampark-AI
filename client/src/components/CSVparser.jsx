@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Papa from "papaparse";
-import { UploadCloud } from "lucide-react"; // Import an icon for the button
+// Import necessary icons
+import { UploadCloud, Check, X } from "lucide-react";
 
 // Helper function to extract the first name
 const getFirstName = (fullName) => {
@@ -14,6 +15,8 @@ const CSVParser = () => {
   const [parsedData, setParsedData] = useState([]);
   const [error, setError] = useState("");
   const [fileName, setFileName] = useState(""); // State to hold the selected file name
+  // Add state to track confirmation if needed later
+  // const [isConfirmed, setIsConfirmed] = useState(false);
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -88,6 +91,29 @@ const CSVParser = () => {
     }
   };
 
+  // Handler to confirm the data (can be expanded later)
+  const handleConfirmData = () => {
+    console.log("Data confirmed:", parsedData);
+    // setIsConfirmed(true);
+    // Here you might want to pass the parsedData to a parent component
+    // or trigger the next step in your application flow.
+    alert(`Confirmed ${parsedData.length} rows.`); // Simple feedback
+  };
+
+  // Handler to remove the uploaded data and reset
+  const handleRemoveData = () => {
+    console.log("Data removed");
+    setParsedData([]);
+    setFileName("");
+    setError("");
+    // setIsConfirmed(false);
+    // Reset the file input visually (optional, might require more complex handling)
+    const fileInput = document.getElementById("csv-upload");
+    if (fileInput) {
+      fileInput.value = ""; // Attempt to clear the file input
+    }
+  };
+
   return (
     // Main container with padding and margin
     <div id="csv-parser" className="csv-parser container mx-auto px-4 py-8">
@@ -136,11 +162,30 @@ const CSVParser = () => {
       {/* Data Table Display */}
       {parsedData.length > 0 && (
         <div className="overflow-x-auto border border-indigo-600 shadow-md shadow-indigo-200 rounded-lg">
-          {" "}
-          {/* Added shadow and rounded corners */}
-          <h3 className="text-xl font-semibold text-gray-700 mb-4 px-4 pt-4">
-            Preview Data ({parsedData.length} rows)
-          </h3>
+          {/* Header section for the table preview */}
+          <div className="flex justify-between items-center mb-4 px-4 pt-4">
+            <h3 className="text-xl font-semibold text-gray-700">
+              Preview Data ({parsedData.length} rows)
+            </h3>
+            {/* Confirm and Remove Buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={handleRemoveData}
+                title="Remove Data"
+                className="p-2 rounded-full text-red-600 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-500 transition-colors duration-200"
+              >
+                <X size={20} />
+              </button>
+              <button
+                onClick={handleConfirmData}
+                title="Confirm Data"
+                className="p-2 rounded-full text-green-600 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-green-500 transition-colors duration-200"
+              >
+                <Check size={20} />
+              </button>
+            </div>
+          </div>
+
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-indigo-500 text-white">
               {" "}

@@ -2,6 +2,7 @@ import React from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import CSVParser from "../components/CSVparser";
+import EmailEditor from "../components/EmailEditor";
 
 const Hero = () => {
   return (
@@ -45,6 +46,7 @@ const MailingLayout = () => {
         <Hero />
 
         <CSVParser />
+        <EmailEditor />
       </main>
       <Footer />
     </div>
