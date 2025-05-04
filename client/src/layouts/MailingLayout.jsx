@@ -1,4 +1,4 @@
-import React, { useState } from "react"; // Import useState
+import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import CSVParser from "../components/CSVparser";
@@ -17,7 +17,6 @@ const Hero = () => {
             <button
               className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               onClick={() => {
-                // scroll to the CSV parser section
                 const csvParserSection = document.getElementById("csv-parser");
                 if (csvParserSection) {
                   csvParserSection.scrollIntoView({ behavior: "smooth" });
@@ -47,7 +46,6 @@ const MailingLayout = () => {
   const [personalizedEmails, setPersonalizedEmails] = useState([]);
   const [isReady, setIsReady] = useState(false);
 
-  // Helper to fill template with recipient data
   const fillTemplate = (template, recipient) => {
     return template.replace(/\{\{(\w+)\}\}/g, (match, key) =>
       recipient[key] !== undefined && recipient[key] !== null
@@ -56,7 +54,6 @@ const MailingLayout = () => {
     );
   };
 
-  // Callback function for CSVParser to update the confirmed data
   const handleDataConfirm = (data) => {
     const processedData = data.map((recipient) => ({
       ...recipient,
@@ -66,7 +63,6 @@ const MailingLayout = () => {
     }));
     setConfirmedRecipients(processedData);
 
-    // Generate default personalized emails using the base template
     const defaultEmails = processedData.map((recipient) => ({
       recipient,
       subject: "Congratulations on Your Achievement",
@@ -80,16 +76,19 @@ const MailingLayout = () => {
     }
   };
 
-  // Callback function for EmailEditor to save the email content (example)
   const handleEmailSave = (content) => {
     setBaseTemplate(content);
-    // Optionally, update personalizedEmails with the new template for all recipients
     const updatedEmails = confirmedRecipients.map((recipient) => ({
       recipient,
       subject: "Congratulations on Your Achievement",
       body: fillTemplate(content, recipient),
     }));
     setPersonalizedEmails(updatedEmails);
+    setIsReady(true);
+  };
+
+  const handlePersonalizedEmails = (emails) => {
+    setPersonalizedEmails(emails);
     setIsReady(true);
   };
 
@@ -107,13 +106,8 @@ const MailingLayout = () => {
           recipients={confirmedRecipients}
           onSave={handleEmailSave}
           initialContent={baseTemplate}
-          onPersonalizedEmails={setPersonalizedEmails}
+          onPersonalizedEmails={handlePersonalizedEmails}
         />
-
-        {/* {personalizedEmails.length > 0 && (
-          <SendMails emails={personalizedEmails} />
-        )} */}
-
         {isReady && personalizedEmails.length > 0 && (
           <SendMails emails={personalizedEmails} onClose={handleClose} />
         )}
