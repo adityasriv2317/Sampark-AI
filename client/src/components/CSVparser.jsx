@@ -3,20 +3,15 @@ import Papa from "papaparse";
 // Import necessary icons
 import { UploadCloud, Check, X } from "lucide-react";
 
-// Helper function to extract the first name
-const getFirstName = (fullName) => {
-  if (!fullName || typeof fullName !== "string") {
-    return ""; // Return empty string if name is invalid
-  }
-  return fullName.trim().split(" ")[0]; // Get the first part after trimming
-};
+// Remove the getFirstName helper function as it's no longer needed
+// const getFirstName = (fullName) => { ... };
 
-const CSVParser = () => {
+// Accept onDataConfirm prop
+const CSVParser = ({ onDataConfirm }) => {
   const [parsedData, setParsedData] = useState([]);
   const [error, setError] = useState("");
-  const [fileName, setFileName] = useState(""); // State to hold the selected file name
-  // Add state to track confirmation if needed later
-  // const [isConfirmed, setIsConfirmed] = useState(false);
+  const [fileName, setFileName] = useState("");
+  // const [isConfirmed, setIsConfirmed] = useState(false); // Keep track if data is confirmed locally if needed
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -25,14 +20,15 @@ const CSVParser = () => {
       setFileName(file.name); // Set the file name
       setError(""); // Clear previous errors
       setParsedData([]); // Clear previous data
+      // setIsConfirmed(false); // Reset confirmation status on new file upload
 
       Papa.parse(file, {
         header: true,
         skipEmptyLines: true, // Skip empty lines
         complete: (results) => {
-          // Validate if the CSV has required columns - Changed "FirstName" to "Name"
+          // Validate if the CSV has required columns - Changed "Name" to "FirstName"
           const requiredColumns = [
-            "Name", // Changed from FirstName
+            "FirstName", // Expect FirstName directly
             "Email",
             "Organization",
             "Achievement",
@@ -46,6 +42,7 @@ const CSVParser = () => {
             );
             setParsedData([]);
             setFileName("");
+            if (onDataConfirm) onDataConfirm([]);
             return;
           }
 
@@ -54,24 +51,26 @@ const CSVParser = () => {
           );
 
           if (missingColumns.length > 0) {
-            // Updated error message
+            // Updated error message to reflect FirstName requirement
             setError(
               `Missing required columns: ${missingColumns.join(
                 ", "
-              )}. Please ensure your CSV has 'Name', 'Email', 'Organization', 'Achievement', and 'Role' columns.`
+              )}. Please ensure your CSV has 'FirstName', 'Email', 'Organization', 'Achievement', and 'Role' columns.`
             );
             setParsedData([]);
             setFileName(""); // Clear filename on error
+            if (onDataConfirm) onDataConfirm([]);
           } else {
             // Filter out rows where all required fields might be empty
             const validData = results.data.filter((row) =>
-              requiredColumns.some((col) => row[col] && row[col].trim() !== "")
+              requiredColumns.some((col) => row[col] && String(row[col]).trim() !== "") // Ensure value is treated as string
             );
             if (validData.length === 0 && results.data.length > 0) {
               setError(
                 "CSV parsed, but no valid data rows found (rows might be empty or lack required fields)."
               );
               setParsedData([]);
+              if (onDataConfirm) onDataConfirm([]);
             } else {
               setParsedData(validData);
               setError("");
@@ -82,35 +81,44 @@ const CSVParser = () => {
           setError("Error parsing CSV file: " + error.message);
           setParsedData([]);
           setFileName(""); // Clear filename on error
+          if (onDataConfirm) onDataConfirm([]);
         },
       });
     } else {
       setFileName(""); // Clear filename if no file is selected
       setParsedData([]);
       setError("");
+      // setIsConfirmed(false);
+      // Call onDataConfirm with empty array if file selection is cleared
+      if (onDataConfirm) onDataConfirm([]);
     }
   };
 
-  // Handler to confirm the data (can be expanded later)
+  // Call onDataConfirm when data is confirmed
   const handleConfirmData = () => {
-    console.log("Data confirmed:", parsedData);
+    // console.log("Data confirmed in CSVParser:", parsedData);
     // setIsConfirmed(true);
-    // Here you might want to pass the parsedData to a parent component
-    // or trigger the next step in your application flow.
-    alert(`Confirmed ${parsedData.length} rows.`); // Simple feedback
+    if (onDataConfirm) {
+      onDataConfirm(parsedData); // Pass the data up to the parent
+    }
+    // Keep the alert or provide other feedback
+    // alert(`Confirmed ${parsedData.length} rows. You can now compose your email below.`);
   };
 
-  // Handler to remove the uploaded data and reset
+  // Call onDataConfirm with empty array when data is removed
   const handleRemoveData = () => {
-    console.log("Data removed");
+    // console.log("Data removed");
     setParsedData([]);
     setFileName("");
     setError("");
     // setIsConfirmed(false);
-    // Reset the file input visually (optional, might require more complex handling)
+    if (onDataConfirm) {
+      onDataConfirm([]); // Pass empty array up to clear recipients in parent
+    }
+    // Reset the file input visually
     const fileInput = document.getElementById("csv-upload");
     if (fileInput) {
-      fileInput.value = ""; // Attempt to clear the file input
+      fileInput.value = "";
     }
   };
 
@@ -142,9 +150,9 @@ const CSVParser = () => {
             Selected file: <span className="font-medium">{fileName}</span>
           </p>
         )}
-        {/* Updated helper text */}
+        {/* Updated helper text to mention FirstName */}
         <p className="mt-2 text-xs text-gray-500">
-          Required columns: Name, Email, Organization, Achievement, Role
+          Required columns: FirstName, Email, Organization, Achievement, Role
         </p>
       </div>
 
@@ -159,6 +167,8 @@ const CSVParser = () => {
         </div>
       )}
 
+      {/* Make sure the Confirm button calls handleConfirmData */}
+      {/* Make sure the Remove button calls handleRemoveData */}
       {/* Data Table Display */}
       {parsedData.length > 0 && (
         <div className="overflow-x-auto border border-indigo-600 shadow-md shadow-indigo-200 rounded-lg">
@@ -170,16 +180,17 @@ const CSVParser = () => {
             {/* Confirm and Remove Buttons */}
             <div className="flex gap-2">
               <button
-                onClick={handleRemoveData}
+                onClick={handleRemoveData} // Ensure this calls the updated handler
                 title="Remove Data"
                 className="p-2 rounded-full text-red-600 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-500 transition-colors duration-200"
               >
                 <X size={20} />
               </button>
               <button
-                onClick={handleConfirmData}
+                onClick={handleConfirmData} // Ensure this calls the updated handler
                 title="Confirm Data"
                 className="p-2 rounded-full text-green-600 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-green-500 transition-colors duration-200"
+                // disabled={isConfirmed} // Optionally disable after confirming
               >
                 <Check size={20} />
               </button>
@@ -191,18 +202,16 @@ const CSVParser = () => {
               {" "}
               {/* Styled table header */}
               <tr>
-                {/* Updated headers */}
-                {["Name", "Email", "Organization", "Achievement", "Role"].map(
+                {/* Updated headers to expect FirstName */}
+                {["FirstName", "Email", "Organization", "Achievement", "Role"].map(
                   (header) => (
                     <th
                       key={header}
                       scope="col"
                       className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
                     >
-                      {/* Display "First Name" for the "Name" column header */}
-                      {header === "Name"
-                        ? "First Name"
-                        : header.replace(/([A-Z])/g, " $1").trim()}
+                      {/* Display header, split camelCase for readability */}
+                      {header.replace(/([A-Z])/g, " $1").trim()}
                     </th>
                   )
                 )}
@@ -214,11 +223,9 @@ const CSVParser = () => {
                   key={index}
                   className="hover:bg-gray-50 transition-colors duration-150"
                 >
-                  {" "}
-                  {/* Hover effect */}
-                  {/* Extract and display First Name from Name column */}
+                  {/* Use row.FirstName directly */}
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {getFirstName(row.Name)}
+                    {row.FirstName}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                     {row.Email}
