@@ -3,7 +3,7 @@ const EmailSchedule = require("./models/EmailSchedule");
 
 const saveEmailSchedule = async ({ scheduledTime, emails }) => {
   try {
-    const schedule = new EmailSchedule({ scheduledTime, emails });
+    const schedule = new EmailSchedule({ scheduledTime, emails, createdAt: scheduledTime });
     const saved = await schedule.save();
     return { success: true, data: saved };
   } catch (error) {

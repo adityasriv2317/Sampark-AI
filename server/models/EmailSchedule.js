@@ -17,7 +17,7 @@ const emailSchema = new mongoose.Schema({
 const emailScheduleSchema = new mongoose.Schema({
   scheduledTime: { type: Date, required: true },
   emails: { type: [emailSchema], required: true },
-  createdAt: { type: Date, default: Date.now },
+  createdAt: { type: Date },
 });
 
 module.exports = mongoose.model('EmailSchedule', emailScheduleSchema);
