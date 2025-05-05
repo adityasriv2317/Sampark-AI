@@ -10,7 +10,7 @@ const MyMails = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/all-mails")
+      .get("https://sampark-ai.onrender.com/all-mails")
       .then((res) => {
         setMails(res.data);
         setLoading(false);
@@ -29,7 +29,10 @@ const MyMails = () => {
           My Mails
         </h1>
         {loading ? (
-          <div className="text-center text-gray-500 text-lg">Loading...</div>
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <div className="text-center text-gray-500 text-lg">Loading...</div>
+          </div>
         ) : error ? (
           <div className="text-center text-red-500 text-lg">{error}</div>
         ) : mails.length === 0 ? (
