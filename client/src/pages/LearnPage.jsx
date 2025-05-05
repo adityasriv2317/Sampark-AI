@@ -4,9 +4,9 @@ import Footer from "../components/Footer";
 
 const LearnPage = () => {
   return (
-    <div className="bg-indigo-50 min-h-screen p-10">
+    <div className="bg-indigo-50 min-h-screen">
       <Navbar />
-      <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+      <div className="max-w-4xl mx-auto bg-white p-8 mt-4 rounded-lg shadow-lg">
         <h1 className="text-3xl font-semibold text-indigo-800 mb-4">
           How to Send Emails with Sampark.AI
         </h1>
