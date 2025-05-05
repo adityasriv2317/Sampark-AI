@@ -59,7 +59,17 @@ app.get("/all-mails", async (req, res) => {
   try {
     const EmailSchedule = require("./models/EmailSchedule");
     const allMails = await EmailSchedule.find().sort({ createdAt: -1 });
-    res.status(200).json(allMails);
+
+    // Flatten and map to only required fields
+    const result = allMails.flatMap(schedule =>
+      schedule.emails.map(email => ({
+        name: email.recipient?.FirstName || "",
+        email: email.recipient?.Email || "",
+        scheduledTime: schedule.scheduledTime
+      }))
+    );
+
+    res.status(200).json(result);
   } catch (error) {
     console.error("Error fetching all mails:", error);
     res.status(500).json({ error: "Failed to fetch emails." });
