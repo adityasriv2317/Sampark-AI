@@ -8,6 +8,8 @@ const MyMails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // .get("https://sampark-ai.onrender.com/all-mails")/*   */
+
   useEffect(() => {
     axios
       .get("https://sampark-ai.onrender.com/all-mails")
@@ -36,15 +38,23 @@ const MyMails = () => {
         ) : error ? (
           <div className="text-center text-red-500 text-lg">{error}</div>
         ) : mails.length === 0 ? (
-          <div className="text-center text-gray-500 text-lg">No mails found.</div>
+          <div className="text-center text-gray-500 text-lg">
+            No mails found.
+          </div>
         ) : (
           <div className="overflow-x-auto border-indigo-600 border rounded-xl">
             <table className="min-w-full bg-white rounded-xl shadow-lg overflow-hidden">
               <thead className="bg-indigo-100">
                 <tr>
-                  <th className="py-3 px-4 text-left font-semibold text-indigo-700">Name</th>
-                  <th className="py-3 px-4 text-left font-semibold text-indigo-700">Email</th>
-                  <th className="py-3 px-4 text-left font-semibold text-indigo-700">Scheduled Time</th>
+                  <th className="py-3 px-4 text-left font-semibold text-indigo-700">
+                    Name
+                  </th>
+                  <th className="py-3 px-4 text-left font-semibold text-indigo-700">
+                    Email
+                  </th>
+                  <th className="py-3 px-4 text-left font-semibold text-indigo-700">
+                    Scheduled Time
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -53,8 +63,12 @@ const MyMails = () => {
                     key={idx}
                     className="hover:bg-indigo-50 transition-colors even:bg-gray-50"
                   >
-                    <td className="py-3 px-4 border-b border-gray-200">{mail.name || "-"}</td>
-                    <td className="py-3 px-4 border-b border-gray-200 break-all">{mail.email || "-"}</td>
+                    <td className="py-3 px-4 border-b border-gray-200">
+                      {mail.name || "-"}
+                    </td>
+                    <td className="py-3 px-4 border-b border-gray-200 break-all">
+                      {mail.email || "-"}
+                    </td>
                     <td className="py-3 px-4 border-b border-gray-200">
                       {mail.scheduledTime
                         ? new Date(mail.scheduledTime).toLocaleString()
