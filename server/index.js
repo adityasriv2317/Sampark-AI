@@ -36,7 +36,7 @@ app.post("/set-emails", async (req, res) => {
   if (!result.success) {
     return res.status(500).json({ error: result.error });
   }
-  
+
   cron.schedule(
     cronExpression,
     () => {
@@ -53,6 +53,17 @@ app.post("/set-emails", async (req, res) => {
     .status(200)
     .json({ message: "Email scheduling initiated.", scheduledTime });
   console.log("Scheduled Emails");
+});
+
+app.get("/all-mails", async (req, res) => {
+  try {
+    const EmailSchedule = require("./models/EmailSchedule");
+    const allMails = await EmailSchedule.find().sort({ createdAt: -1 });
+    res.status(200).json(allMails);
+  } catch (error) {
+    console.error("Error fetching all mails:", error);
+    res.status(500).json({ error: "Failed to fetch emails." });
+  }
 });
 
 // Function to convert scheduledTime (ISO format) to cron expression

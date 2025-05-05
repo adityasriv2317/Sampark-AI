@@ -79,8 +79,18 @@ const Navbar = () => {
               className="flex items-center justify-center md:justify-start gap-2 py-2 px-3 md:p-0 rounded hover:bg-indigo-700 md:hover:bg-transparent md:hover:text-indigo-200 transition-colors duration-200"
               onClick={handleLinkClick}
             >
-              <MailPlus size={18} /> {/* New Mailing Icon */}
+              <MailPlus size={18} />
               New Mailing
+            </Link>
+          </li>
+          <li className="my-2 md:my-0">
+            <Link
+              to="/my-mails"
+              className="flex items-center justify-center md:justify-start gap-2 py-2 px-3 md:p-0 rounded hover:bg-indigo-700 md:hover:bg-transparent md:hover:text-indigo-200 transition-colors duration-200"
+              onClick={handleLinkClick}
+            >
+              <Mails size={18} />
+              My Mails
             </Link>
           </li>
         </ul>
