@@ -3,11 +3,14 @@ const cors = require("cors");
 const cron = require("node-cron");
 const { sendMail } = require("./mailController");
 const { sendbulkEmails } = require("./bulkController");
+const connectDB = require("./config/mongo");
+const saveEmailSchedule = require("./saveEmail");
 const app = express();
 require("dotenv").config();
 let port = 3000;
 
 app.use(cors());
+connectDB();
 
 app.use(express.json());
 
@@ -17,27 +20,7 @@ app.get("/", (req, res) => {
 
 app.post("/sendmail", sendMail);
 
-// app.post("/send-mails", sendBulkMail);
-
-// app.post("/set-emails", async (req, res) => {
-//   const { scheduledTime, emails } = req.body;
-//   if (!scheduledTime || !emails || !Array.isArray(emails)) {
-//     return res.status(400).json({ error: "Invalid request body" });
-//   }
-//   try {
-//     await scheduleBulkEmails(scheduledTime, emails);
-//     res
-//       .status(200)
-//       .json({ success: true, message: "Emails scheduled successfully" });
-//   } catch (error) {
-//     console.error("Error scheduling emails:", error);
-//     res
-//       .status(500)
-//       .json({ success: false, message: "Failed to schedule emails" });
-//   }
-// });
-
-app.post("/set-emails", (req, res) => {
+app.post("/set-emails", async (req, res) => {
   const { scheduledTime, emails } = req.body;
 
   if (!scheduledTime || !emails || emails.length === 0) {
@@ -47,6 +30,12 @@ app.post("/set-emails", (req, res) => {
   }
 
   const cronExpression = convertToCronExpression(scheduledTime);
+
+  const result = await saveEmailSchedule({ scheduledTime, emails });
+
+  if (!result.success) {
+    return res.status(500).json({ error: result.error });
+  }
 
   cron.schedule(
     cronExpression,
@@ -64,6 +53,27 @@ app.post("/set-emails", (req, res) => {
     .status(200)
     .json({ message: "Email scheduling initiated.", scheduledTime });
   console.log("Scheduled Emails");
+});
+
+app.get("/all-mails", async (req, res) => {
+  try {
+    const EmailSchedule = require("./models/EmailSchedule");
+    const allMails = await EmailSchedule.find().sort({ createdAt: -1 });
+
+    // Flatten and map to only required fields
+    const result = allMails.flatMap(schedule =>
+      schedule.emails.map(email => ({
+        name: email.recipient?.FirstName || "",
+        email: email.recipient?.Email || "",
+        scheduledTime: schedule.scheduledTime
+      }))
+    );
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error fetching all mails:", error);
+    res.status(500).json({ error: "Failed to fetch emails." });
+  }
 });
 
 // Function to convert scheduledTime (ISO format) to cron expression
