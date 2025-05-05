@@ -9,9 +9,8 @@ const MyMails = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Replace with your actual API endpoint
     axios
-      .get("http://localhost:3000/api/mymails")
+      .get("http://localhost:3000/all-mails")
       .then((res) => {
         setMails(res.data);
         setLoading(false);
@@ -23,45 +22,40 @@ const MyMails = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 to-white">
       <Navbar />
-      <div className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6 text-center">My Mails</h1>
+      <div className="flex-1 container mx-auto px-2 sm:px-4 py-8 w-full">
+        <h1 className="text-3xl sm:text-4xl font-extrabold mb-8 text-indigo-600 text-center border-b-4 border-indigo-500 w-fit mx-auto pb-2 shadow-sm">
+          My Mails
+        </h1>
         {loading ? (
-          <div className="text-center text-gray-500">Loading...</div>
+          <div className="text-center text-gray-500 text-lg">Loading...</div>
         ) : error ? (
-          <div className="text-center text-red-500">{error}</div>
+          <div className="text-center text-red-500 text-lg">{error}</div>
         ) : mails.length === 0 ? (
-          <div className="text-center text-gray-500">No mails found.</div>
+          <div className="text-center text-gray-500 text-lg">No mails found.</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white rounded-lg shadow">
-              <thead>
+          <div className="overflow-x-auto border-indigo-600 border rounded-xl">
+            <table className="min-w-full bg-white rounded-xl shadow-lg overflow-hidden">
+              <thead className="bg-indigo-100">
                 <tr>
-                  <th className="py-2 px-4 border-b">Recipient</th>
-                  <th className="py-2 px-4 border-b">Email</th>
-                  <th className="py-2 px-4 border-b">Subject</th>
-                  <th className="py-2 px-4 border-b">Body</th>
-                  <th className="py-2 px-4 border-b">Date</th>
+                  <th className="py-3 px-4 text-left font-semibold text-indigo-700">Name</th>
+                  <th className="py-3 px-4 text-left font-semibold text-indigo-700">Email</th>
+                  <th className="py-3 px-4 text-left font-semibold text-indigo-700">Scheduled Time</th>
                 </tr>
               </thead>
               <tbody>
                 {mails.map((mail, idx) => (
-                  <tr key={idx} className="hover:bg-gray-100">
-                    <td className="py-2 px-4 border-b">
-                      {mail.recipient?.FirstName || "-"}
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                      {mail.recipient?.Email || "-"}
-                    </td>
-                    <td className="py-2 px-4 border-b">{mail.subject}</td>
-                    <td className="py-2 px-4 border-b">
-                      <div className="max-w-xs truncate" title={mail.body}>
-                        {mail.body}
-                      </div>
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                      {mail.date ? new Date(mail.date).toLocaleString() : "-"}
+                  <tr
+                    key={idx}
+                    className="hover:bg-indigo-50 transition-colors even:bg-gray-50"
+                  >
+                    <td className="py-3 px-4 border-b border-gray-200">{mail.name || "-"}</td>
+                    <td className="py-3 px-4 border-b border-gray-200 break-all">{mail.email || "-"}</td>
+                    <td className="py-3 px-4 border-b border-gray-200">
+                      {mail.scheduledTime
+                        ? new Date(mail.scheduledTime).toLocaleString()
+                        : "-"}
                     </td>
                   </tr>
                 ))}
